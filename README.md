@@ -1,4 +1,4 @@
-#(Adapt README to this project)
+# (Adapt README to this project)
 
 # dl_sparkify
 
