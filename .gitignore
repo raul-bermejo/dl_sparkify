@@ -1,5 +1,6 @@
 # Added Manually
 *.cfg
+.vscode/
 
 
 # Byte-compiled / optimized / DLL files
