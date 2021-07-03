@@ -20,7 +20,7 @@ s3 = boto3.client('s3',
 
 # Create s3 bucket and upload zipped files from data dir (only once)
 create_bucket = False
-upload_data = False
+upload_files = True
 
 bucket_name = 'dl-sparkify'
 files = ['log-data.zip', 'song-data.zip']
@@ -29,7 +29,12 @@ if create_bucket:
     location = {'LocationConstraint': region}
     s3.create_bucket(Bucket=f'{bucket_name}',
                      CreateBucketConfiguration=location)
+    print(f"The bucket {bucket_name} was created succesfully. \n", "="*60)
 
+if upload_files:
+    for filename in files:
+        s3.upload_file(f"./data/{filename}", bucket_name, filename)
+    print(f"The files were uploaded into {bucket_name} bucket succesfully. \n", "="*60)
 
 # Print existing buckets
 response = s3.list_buckets()
