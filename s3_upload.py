@@ -20,7 +20,7 @@ s3 = boto3.client('s3',
 
 # Create s3 bucket and upload zipped files from data dir (only once)
 create_bucket = False
-upload_files = True
+upload_files = False
 
 bucket_name = 'dl-sparkify'
 files = ['log-data.zip', 'song-data.zip']
@@ -39,4 +39,4 @@ if upload_files:
 # Print existing buckets
 response = s3.list_buckets()
 bucket_list = [bucket['Name'] for bucket in response["Buckets"]]
-print(bucket_list)
+print("Current Buckets:", bucket_list)
