@@ -1,6 +1,7 @@
 # Added Manually
 *.cfg
 .vscode/
+sandpit*
 
 
 # Byte-compiled / optimized / DLL files
