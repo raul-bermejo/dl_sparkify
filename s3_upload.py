@@ -23,7 +23,8 @@ create_bucket = False
 upload_files = False
 
 bucket_name = 'dl-sparkify'
-files = ['log-data.zip', 'song-data.zip']
+# files = ['log-data.zip', 'song-data.zip']
+files = ['song-data-test.json']
 
 if create_bucket:
     location = {'LocationConstraint': region}
