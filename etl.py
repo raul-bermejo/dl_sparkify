@@ -23,10 +23,10 @@ def create_spark_session():
 
 def process_song_data(spark, input_data, output_data):
     # get filepath to song data file
-    song_data = 'data/song-data.zip'
+    song_data = os.path.join(input_data, 'song-data-test.json')
     
     # read song data file
-    df = 
+    df = spark.read.json(song_data)
 
     # extract columns to create songs table
     songs_table = 
@@ -42,11 +42,12 @@ def process_song_data(spark, input_data, output_data):
 
 
 def process_log_data(spark, input_data, output_data):
+    
     # get filepath to log data file
-    log_data =
+    log_data = os.path.join(input_data, 'log-data-test.json')
 
     # read log data file
-    df = 
+    df_song = spark.read.json(log_data)
     
     # filter by actions for song plays
     df = 
@@ -83,8 +84,8 @@ def process_log_data(spark, input_data, output_data):
 
 def main():
     spark = create_spark_session()
-    input_data = "s3a://udacity-dend/"
-    output_data = ""
+    input_bucket = "s3a://dl-sparkify/"
+    output_bucket = ""
     
     process_song_data(spark, input_data, output_data)    
     process_log_data(spark, input_data, output_data)
