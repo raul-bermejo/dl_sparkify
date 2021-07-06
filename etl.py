@@ -13,7 +13,6 @@ config.read_file(open('dl.cfg'))
 AWS_KEY_ID = config.get('AWS','AWS_KEY_ID')
 AWS_SECRET = config.get('AWS','AWS_SECRET')
 
-
 def create_spark_session():
     spark = SparkSession \
             .builder \
@@ -48,45 +47,35 @@ def process_song_data(spark, input_data, output_data):
             .parquet(os.path.join(output_data, "artists_table.parquet"))
 
 
-# def process_log_data(spark, input_data, output_data):
+def process_log_data(spark, input_data, output_data):
     
-#     # get filepath to log data file
-#     log_data = os.path.join(input_data, 'log-data-test.json')
+    # get filepath to log data file
+    log_data = os.path.join(input_data, 'log-data-test.json')
 
-#     # read log data file
-#     df_song = spark.read.json(log_data)
+    # read log data file
+    df_log = spark.read.json(log_data)
     
-#     # filter by actions for song plays
-#     df = 
-
-#     # extract columns for users table    
-#     artists_table = 
+    # filter by actions for song plays
+    df_songplay = df_log.filter(df_log.page == "NextSong")
     
-#     # write users table to parquet files
-#     artists_table
-
-#     # create timestamp column from original timestamp column
-#     get_timestamp = udf()
-#     df = 
+    # create datetime column from original timestamp column
+    get_datetime = udf(lambda ts: datetime.utcfromtimestamp(int(ts)/1000).strftime('%Y-%m-%d %H:%M:%S'))
+    df_log = df.withColumn("datetime",  get_datetime("ts"))
     
-#     # create datetime column from original timestamp column
-#     get_datetime = udf()
-#     df = 
+    # extract columns to create time table
+    time_table = 
     
-#     # extract columns to create time table
-#     time_table = 
-    
-#     # write time table to parquet files partitioned by year and month
-#     time_table
+    # write time table to parquet files partitioned by year and month
+    time_table
 
-#     # read in song data to use for songplays table
-#     song_df = 
+    # read in song data to use for songplays table
+    df_song = 
 
-#     # extract columns from joined song and log datasets to create songplays table 
-#     songplays_table = 
+    # extract columns from joined song and log datasets to create songplays table 
+    songplays_table = 
 
-#     # write songplays table to parquet files partitioned by year and month
-#     songplays_table
+    # write songplays table to parquet files partitioned by year and month
+    songplays_table
 
 
 def main():
