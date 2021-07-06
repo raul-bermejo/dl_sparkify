@@ -25,10 +25,10 @@ def create_spark_session():
 
 def process_song_data(spark, input_data, output_data):
     # get filepath to song data file
-    song_data = os.path.join(input_data, 'song-data-test.json')
+    path_songdata = os.path.join(input_data, 'song-data-test.json')
     
     # read song data file
-    df = spark.read.json(song_data)
+    df = spark.read.json(path_songdata)
 
     # extract columns to create songs table
     songs_table = df.select("song_id", "title", "artist_id", "year", "duration")
@@ -49,29 +49,37 @@ def process_song_data(spark, input_data, output_data):
 
 def process_log_data(spark, input_data, output_data):
     
-    # get filepath to log data file
-    log_data = os.path.join(input_data, 'log-data-test.json')
+    # get filepath to log file
+    path_logdata = os.path.join(input_data, 'log-data-test.json')
 
     # read log data file
-    df_log = spark.read.json(log_data)
+    df_log = spark.read.json(path_logdata)
     
     # filter by actions for song plays
     df_songplay = df_log.filter(df_log.page == "NextSong")
     
     # create datetime column from original timestamp column
     get_datetime = udf(lambda ts: datetime.utcfromtimestamp(int(ts)/1000).strftime('%Y-%m-%d %H:%M:%S'))
-    df_log = df.withColumn("datetime",  get_datetime("ts"))
+    df_log = df_log.withColumn("datetime",  get_datetime("ts"))
     
     # extract columns to create time table
-    time_table = 
+    time_table = df_log.withColumn("hour",  hour("datetime")) \
+       .withColumn("day",  dayofmonth("datetime")) \ 
+       .withColumn("week",  weekofyear("datetime")) \ 
+       .withColumn("month",  month("datetime")) \ 
+       .withColumn("year", year("datetime")) \
+       .withColumn("weekday",  dayofweek("datetime")) \ 
+       .select("ts","hour","day","week","month","year","weekday")
     
     # write time table to parquet files partitioned by year and month
-    time_table
+    time_table.write \
+            .parquet(os.path.join(output_data, "time_table.parquet"))
 
     # read in song data to use for songplays table
-    df_song = 
+    path_songdata = os.path.join(input_data, 'song-data-test.json')
+    df_song = spark.read.json(path_songdata)
 
-    # extract columns from joined song and log datasets to create songplays table 
+    # extract columns from joined song and log datasets to create songplays table     
     songplays_table = 
 
     # write songplays table to parquet files partitioned by year and month
