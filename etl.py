@@ -69,7 +69,7 @@ def process_log_data(spark, input_data, output_data):
        .withColumn("month",  month("datetime")) \ 
        .withColumn("year", year("datetime")) \
        .withColumn("weekday",  dayofweek("datetime")) \ 
-       .select("ts","hour","day","week","month","year","weekday")
+       .select("datime","hour","day","week","month","year","weekday")
     
     # write time table to parquet files partitioned by year and month
     time_table.write \
