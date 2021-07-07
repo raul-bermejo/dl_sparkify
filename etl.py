@@ -81,14 +81,19 @@ def process_log_data(spark, input_data, output_data):
     df_master = df_song.join(df_log, (df_song.artist_name == df_log.artist) & \
                                     (df_song.title == df_log.song) & \
                                     (df_song.duration == df_log.length))
+    # add sequential id to master df
+    df_master = df_master.withColumn("songplay_id", monotonically_increasing_id())
     # Might need to filter non null values
     # df_master.filter
 
     # extract columns from joined song and log datasets to create songplays table     
-    songplays_table = 
+    songplays_table = df_master.select("songplay_id", "datetime", "user_id", "song_id", 
+                                       "artist_id", "session_id", "location", "user_agent")
 
     # write songplays table to parquet files partitioned by year and month
-    songplays_table
+    songplays_table.write \
+            .partitionBy(year("datetime"), month("datetime")) \
+            .parquet(os.path.join(output_data, "songs_table.parquet"))
 
 
 def main():
