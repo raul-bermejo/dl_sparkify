@@ -70,7 +70,7 @@ def process_log_data(spark, input_data, output_data):
 #        .withColumn("week",  weekofyear("datetime")) \ 
 #        .withColumn("month",  month("datetime")) \ 
 #        .withColumn("year", year("datetime")) \
-#        .withColumn("weekday",  dayofweek("datetime")) \ 
+#        .withColumn("weekday",  dayofweek("datetime")) \
 #        .select("ts","hour","day","week","month","year","weekday")
     
     # write time table to parquet files partitioned by year and month
@@ -83,17 +83,20 @@ def process_log_data(spark, input_data, output_data):
     df_master = df_song.join(df_log, (df_song.artist_name == df_log.artist) & \
                                     (df_song.title == df_log.song) & \
                                     (df_song.duration == df_log.length))
-    # add sequential id to master df
-    df_master = df_master.withColumn("songplay_id", monotonically_increasing_id())
+    
+    # add sequential id, year and month (for partitioning) to df_master
+    df_master = df_master.withColumn("songplay_id", monotonically_increasing_id()).withColumn("month",  month("datetime")).withColumn("year", year("datetime")) \
     # Might need to filter non null values
     # df_master.filter
 
     # extract columns from joined song and log datasets to create songplays table     
     songplays_table = df_master.select("songplay_id", "datetime", "userId", "song_id", 
-                                       "artist_id", "sessionId", "location", "userAgent")
+                                       "artist_id", "sessionId", "location", "userAgent",
+                                       "year", "month")
 
     # write songplays table to parquet files partitioned by year and month
     songplays_table.write \
+            .partitionBy("year", "month") \
             .parquet(os.path.join(output_data, "songs_table.parquet"))
 
 
