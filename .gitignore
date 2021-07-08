@@ -2,6 +2,7 @@
 *.cfg
 .vscode/
 sandpit*
+data/
 
 
 # Byte-compiled / optimized / DLL files

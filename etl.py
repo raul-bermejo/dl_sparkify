@@ -25,10 +25,10 @@ def create_spark_session():
 
 def process_song_data(spark, input_data, output_data):
     # get filepath to song data file
-    path_songdata = os.path.join(input_data, 'song-data-test.json')
+    path_songdata = os.path.join(input_data, '*.json')
     
     # read song data file
-    df = spark.read.json(path_songdata)
+    df = spark.read.text(path_songdata)
 
     # extract columns to create songs table
     songs_table = df.select("song_id", "title", "artist_id", "year", "duration")
@@ -50,7 +50,8 @@ def process_song_data(spark, input_data, output_data):
 def process_log_data(spark, input_data, output_data):
     
     # get filepath to log file
-    path_logdata = os.path.join(input_data, 'log-data-test.json')
+    path_logdata = os.path.join(input_data, '*.json')
+    path_songdata = os.path.join(input_data, '*.json')
 
     # read log data file
     df_log = spark.read.json(path_logdata)
@@ -78,7 +79,6 @@ def process_log_data(spark, input_data, output_data):
             .parquet(os.path.join(output_data, "time_table.parquet"))
 
     # read in song data to use for songplays table
-    path_songdata = os.path.join(input_data, 'song-data-test.json')
     df_song = spark.read.json(path_songdata)
     df_master = df_song.join(df_log, (df_song.artist_name == df_log.artist) & \
                                     (df_song.title == df_log.song) & \
@@ -102,16 +102,16 @@ def process_log_data(spark, input_data, output_data):
 
 def main():
     # define test and prod input/output
-    input_bucket = "s3a://dl-sparkify/"
-    output_bucket = ""
+    input_s3 = "s3://dl-sparkify/input/"
+    output_s3 = "s3://dl-sparkify/output/"
     
     input_local = "./data/input-test/"
     output_local = "./data/output-test/"
     
     spark = create_spark_session()
     
-#     process_song_data(spark, input_local, output_local)    
-    process_log_data(spark, input_local, output_local)
+    process_song_data(spark, input_s3, output_s3)    
+#     process_log_data(spark, input_s3, output_s3)
 
 
 if __name__ == "__main__":
