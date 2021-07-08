@@ -63,13 +63,15 @@ def process_log_data(spark, input_data, output_data):
     df_log = df_log.withColumn("datetime",  get_datetime("ts"))
     
     # extract columns to create time table
-    time_table = df_log.withColumn("hour",  hour("datetime")) \
-       .withColumn("day",  dayofmonth("datetime")) \ 
-       .withColumn("week",  weekofyear("datetime")) \ 
-       .withColumn("month",  month("datetime")) \ 
-       .withColumn("year", year("datetime")) \
-       .withColumn("weekday",  dayofweek("datetime")) \ 
-       .select("ts","hour","day","week","month","year","weekday")
+    time_table = df_log.withColumn("hour",  hour("datetime")).withColumn("day",  dayofmonth("datetime")).withColumn("week",  weekofyear("datetime")).withColumn("month",  month("datetime")).withColumn("year", year("datetime")).withColumn("weekday",  dayofweek("datetime")).select("ts","hour","day","week","month","year","weekday")
+    
+#     time_table = df_log.withColumn("hour",  hour("datetime")) \
+#        .withColumn("day",  dayofmonth("datetime")) \ 
+#        .withColumn("week",  weekofyear("datetime")) \ 
+#        .withColumn("month",  month("datetime")) \ 
+#        .withColumn("year", year("datetime")) \
+#        .withColumn("weekday",  dayofweek("datetime")) \ 
+#        .select("ts","hour","day","week","month","year","weekday")
     
     # write time table to parquet files partitioned by year and month
     time_table.write \
@@ -87,12 +89,11 @@ def process_log_data(spark, input_data, output_data):
     # df_master.filter
 
     # extract columns from joined song and log datasets to create songplays table     
-    songplays_table = df_master.select("songplay_id", "datetime", "user_id", "song_id", 
-                                       "artist_id", "session_id", "location", "user_agent")
+    songplays_table = df_master.select("songplay_id", "datetime", "userId", "song_id", 
+                                       "artist_id", "sessionId", "location", "userAgent")
 
     # write songplays table to parquet files partitioned by year and month
     songplays_table.write \
-            .partitionBy(year("datetime"), month("datetime")) \
             .parquet(os.path.join(output_data, "songs_table.parquet"))
 
 
@@ -106,8 +107,8 @@ def main():
     
     spark = create_spark_session()
     
-    process_song_data(spark, input_local, output_local)    
-#     process_log_data(spark, input_data, output_data)
+#     process_song_data(spark, input_local, output_local)    
+    process_log_data(spark, input_local, output_local)
 
 
 if __name__ == "__main__":
