@@ -2,8 +2,8 @@ import configparser
 from datetime import datetime
 import os
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import udf, col
-from pyspark.sql.functions import year, month, dayofmonth, hour, weekofyear, date_format
+from pyspark.sql.functions import udf, col, monotonically_increasing_id 
+from pyspark.sql.functions import year, month, dayofmonth, hour, weekofyear, dayofweek, date_format, to_timestamp 
 
 
 # Read AWS credentials from .cfg file
@@ -13,21 +13,29 @@ config.read_file(open('dl.cfg'))
 AWS_KEY_ID = config.get('AWS','AWS_KEY_ID')
 AWS_SECRET = config.get('AWS','AWS_SECRET')
 
+os.environ['AWS_KEY_ID']=config['AWS']['AWS_KEY_ID']
+os.environ['AWS_SECRET']=config['AWS']['AWS_SECRET']
+
 def create_spark_session():
+    
     spark = SparkSession \
-            .builder \
-            .appName("Data Wrangling with Spark SQL") \
-            .config("spark.jars.packages", "org.apache.hadoop:hadoop-aws:2.7.0") \
-            .getOrCreate()
+    .builder \
+    .config("spark.jars.packages", "org.apache.hadoop:hadoop-aws:2.7.0") \
+    .config("spark.hadoop.fs.s3a.impl","org.apache.hadoop.fs.s3a.S3AFileSystem") \
+    .config("spark.hadoop.fs.s3a.awsAccessKeyId", os.environ['AWS_KEY_ID']) \
+    .config("spark.hadoop.fs.s3a.awsSecretAccessKey", os.environ['AWS_SECRET']) \
+    .getOrCreate()
 
     return spark
 
+
 def process_song_data(spark, input_data, output_data):
     # get filepath to song data file
-    path_songdata = os.path.join(input_data, 'song-data/*/*/*.json')
+    path_songdata = os.path.join(input_data, 'song-data/*/*/*/*.json')
+    print(path_songdata)
     
     # read song data file
-    df = spark.read.text(path_songdata)
+    df = spark.read.json(path_songdata)
 
     # extract columns to create songs table
     songs_table = df.select("song_id", "title", "artist_id", "year", "duration")
@@ -101,8 +109,8 @@ def process_log_data(spark, input_data, output_data):
 
 def main():
     # define test and prod input/output
-    input_s3 = "s3://dl-sparkify/input/"
-    output_s3 = "s3://dl-sparkify/output/"
+    input_s3 = "s3a://dl-sparkify/input/"
+    output_s3 = "s3a://dl-sparkify/output/"
     
     input_local = "./data/input-test/"
     output_local = "./data/output-test/"
