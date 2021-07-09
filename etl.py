@@ -22,43 +22,9 @@ def create_spark_session():
 
     return spark
 
-def get_song_filepaths():
-    """
-    Returns list of song-data filepaths as located in S3 
-    to read by pyspark.
-    
-    Parameters:
-    ----------
-    None
-    
-    Returns:
-    -------
-    filepath_list: lst
-                   Contains filepahts to song-data as named in S3.
-    
-    """
-    filepath_list = []
-    # Define path to song-data folder 
-    cwd = os.getcwd().replace('\\', '/')
-    song_path = cwd + "/data/input/song-data/"
-    
-    # Perform os.walk() to access all filenames
-    for path, dirnames, filenames in os.walk(song_path):
-        for filename in filenames:
-            # Check file is .json and avoid duplicates
-            if filename.endswith(".json") and filename not in filepath_list:
-                # Clean path and read as is in S3
-                path = path.replace('\\', '/')
-                path = path.replace(cwd + '/data/', '')
-                bucket_s3_url = 's3://dl-sparkify/'
-                # Append path to list
-                filepath_list.append(bucket_s3_url + path + filename)
-                
-    return filepath_list
-
 def process_song_data(spark, input_data, output_data):
     # get filepath to song data file
-    path_songdata = os.path.join(input_data, '*.json')
+    path_songdata = os.path.join(input_data, 'songs-data/*/*/*.json')
     
     # read song data file
     df = spark.read.text(path_songdata)
@@ -84,7 +50,7 @@ def process_log_data(spark, input_data, output_data):
     
     # get filepath to log file
     path_logdata = os.path.join(input_data, '*.json')
-    path_songdata = os.path.join(input_data, '*.json')
+    path_songdata = os.path.join(input_data, 'songs-data/*/*/*.json')
 
     # read log data file
     df_log = spark.read.json(path_logdata)
