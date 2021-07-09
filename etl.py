@@ -24,7 +24,7 @@ def create_spark_session():
 
 def process_song_data(spark, input_data, output_data):
     # get filepath to song data file
-    path_songdata = os.path.join(input_data, 'songs-data/*/*/*.json')
+    path_songdata = os.path.join(input_data, 'song-data/*/*/*.json')
     
     # read song data file
     df = spark.read.text(path_songdata)
@@ -49,8 +49,8 @@ def process_song_data(spark, input_data, output_data):
 def process_log_data(spark, input_data, output_data):
     
     # get filepath to log file
-    path_logdata = os.path.join(input_data, '*.json')
-    path_songdata = os.path.join(input_data, 'songs-data/*/*/*.json')
+    path_logdata = os.path.join(input_data, 'log-data/*.json')
+    path_songdata = os.path.join(input_data, 'song-data/*/*/*.json')
 
     # read log data file
     df_log = spark.read.json(path_logdata)
