@@ -13,10 +13,23 @@ config.read_file(open('dl.cfg'))
 AWS_KEY_ID = config.get('AWS','AWS_KEY_ID')
 AWS_SECRET = config.get('AWS','AWS_SECRET')
 
+# Set credentials as environment variables
 os.environ['AWS_KEY_ID']=config['AWS']['AWS_KEY_ID']
 os.environ['AWS_SECRET']=config['AWS']['AWS_SECRET']
 
 def create_spark_session():
+    """
+    Creates a spark session
+
+    Parameters:
+    -----------
+    None
+
+    Returns:
+    --------
+    spark: pyspark.sql.session.SparkSession
+           Spark session to create dataframes
+    """
     
     spark = SparkSession \
     .builder \
@@ -30,6 +43,22 @@ def create_spark_session():
 
 
 def process_song_data(spark, input_data, output_data):
+    """
+    Extracts objects in S3 buckets, loads song data into 
+    pyspark dataframe. Extracts relevant data and loads it
+    into artust and songs tables, and saves dataframes as
+    .parquet files.
+
+    Parameters:
+    -----------
+    spark: pyspark.sql.session.SparkSession
+           Pyspark session
+    input_data: str
+                Path to input .json data (local or S3 url)
+    output_data: str
+                 Path to output .json data (local or S3 url)
+    """
+
     # get filepath to song data file
     path_songdata = os.path.join(input_data, 'song-data/*/*/*/*.json')
     print(path_songdata)
@@ -55,6 +84,21 @@ def process_song_data(spark, input_data, output_data):
 
 
 def process_log_data(spark, input_data, output_data):
+    """
+    Extracts objects in S3 buckets, loads song data into 
+    pyspark dataframe. Extracts relevant data and loads it
+    into artust and songs tables, and saves dataframes as
+    .parquet files.
+
+    Parameters:
+    -----------
+    spark: pyspark.sql.session.SparkSession
+           Pyspark session
+    input_data: str
+                Path to input .json data (local or S3 url)
+    output_data: str
+                 Path to output .json data (local or S3 url)
+    """
     
     # get filepath to log file
     path_logdata = os.path.join(input_data, 'log-data/*.json')
@@ -112,13 +156,13 @@ def main():
     input_s3 = "s3a://dl-sparkify/input/"
     output_s3 = "s3a://dl-sparkify/output/"
     
-    input_local = "./data/input-test/"
-    output_local = "./data/output-test/"
+    # input_local = "./data/input-test/"
+    # output_local = "./data/output-test/"
     
     spark = create_spark_session()
     
     process_song_data(spark, input_s3, output_s3)    
-#     process_log_data(spark, input_s3, output_s3)
+    process_log_data(spark, input_s3, output_s3)
 
 
 if __name__ == "__main__":
